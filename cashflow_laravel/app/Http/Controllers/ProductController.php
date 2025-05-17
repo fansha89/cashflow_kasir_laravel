@@ -73,9 +73,15 @@ class ProductController extends Controller
     }
 
     public function destroy($id)
-    {
-        $product = \App\Models\Product::findOrFail($id);
-        $product->delete();
-        return redirect()->route('product.index')->with('success', 'Product successfully deleted');
-    }
+{
+    // Hapus data terkait di tabel order_items
+    DB::table('order_items')->where('product_id', $id)->delete();
+
+    // Hapus produk dari tabel products
+    $product = \App\Models\Product::findOrFail($id);
+    $product->delete();
+
+    return redirect()->route('product.index')->with('success', 'Product successfully deleted');
+}
+
 }
