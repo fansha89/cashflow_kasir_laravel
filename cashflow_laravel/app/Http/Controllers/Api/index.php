@@ -16,8 +16,10 @@ define('LARAVEL_START', microtime(true));
 |
 */
 
-if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
-    require $maintenance;
+$maintenanceFile = __DIR__.'/../storage/framework/maintenance.php';
+
+if (file_exists($maintenanceFile)) {
+    require $maintenanceFile;  // Show maintenance page if the app is in maintenance mode.
 }
 
 /*
@@ -31,7 +33,7 @@ if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php'))
 |
 */
 
-require __DIR__.'/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';  // Autoload Composer dependencies
 
 /*
 |--------------------------------------------------------------------------
@@ -44,12 +46,18 @@ require __DIR__.'/../vendor/autoload.php';
 |
 */
 
+// Ensure the application is bootstrapped and ready to handle requests
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
 $kernel = $app->make(Kernel::class);
 
+// Capture the request and pass it through the HTTP kernel to generate a response
 $response = $kernel->handle(
     $request = Request::capture()
-)->send();
+);
 
+// Send the generated response to the client's browser
+$response->send();
+
+// Terminate the kernel to perform any post-response actions
 $kernel->terminate($request, $response);
